@@ -23,6 +23,7 @@
   }
 }
 
+/* src/app/layout.ts에서 설정된 폰트를 여기다 대입 */
 body {
   background: var(--background);
   color: var(--foreground);
