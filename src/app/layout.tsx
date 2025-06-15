@@ -6,6 +6,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 
 // 전역 CSS 파일을 import 합니다.
 import "./globals.css";
+import { Provider } from "./provider";
 
 // Geist Sans 폰트를 설정하고 CSS 변수로 저장합니다.
 const geistSans = Geist({
@@ -36,7 +37,7 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`} // 설정한 폰트 CSS 변수 사용
       >
-        {children}
+        <Provider>{children}</Provider>
       </body>
     </html>
   );
