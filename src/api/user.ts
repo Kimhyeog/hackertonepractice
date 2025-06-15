@@ -11,7 +11,7 @@ import {
   SignUpResponse,
   UpdatePasswordRequest,
   UpdatePasswordResponse,
-  UserInfoReponse,
+  UserInfoResponse,
 } from "@/types/user";
 
 // ** 인증이 필요하지 않은 API
@@ -59,7 +59,7 @@ export const checkLoginState = async (): Promise<CheckLoginStateResponse> => {
 
 // 사용자 정보 조회
 
-export const getUserInfo = async (): Promise<UserInfoReponse> => {
+export const getUserInfo = async (): Promise<UserInfoResponse> => {
   const res = await API.get("/userInfo");
   return res.data;
 };
