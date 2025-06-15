@@ -1,3 +1,10 @@
+import { Header } from "@/components/Header";
+
 export default function Home() {
-  return <div className="">인덱스 페이지</div>;
+  return (
+    <div className="">
+      <Header />
+      인덱스 페이지
+    </div>
+  );
 }
