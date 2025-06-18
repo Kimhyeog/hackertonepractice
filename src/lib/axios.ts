@@ -13,3 +13,9 @@ export const PublicAPI = axios.create({
   withCredentials: false, // 인증 없이 사용하는 API용
   headers: { "Content-Type": "application/json" },
 });
+
+export function getErrorMessage(error: unknown) {
+  if (axios.isAxiosError(error) && error.response)
+    return error.response?.data.message || "알 수 없는 오류";
+  return "알 수 없는 오류";
+}
