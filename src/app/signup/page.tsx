@@ -1,7 +1,9 @@
 "use client";
 // 회원 가입 페이지
 
-import { signUp } from "@/api/signup";
+import { checkUserId, signUp } from "@/api/signup";
+import { getErrorMessage } from "@/lib/axios";
+import { CheckUserIdRequest } from "@/types/signup";
 import { SignUpRequest } from "@/types/user";
 import { useMutation } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
@@ -15,7 +17,10 @@ export default function Page() {
     register,
     handleSubmit,
     formState: { errors },
+    watch,
   } = useForm<SignUpRequest>();
+
+  const userId = watch("userId");
 
   const signUpMutation = useMutation({
     mutationFn: signUp,
@@ -58,6 +63,15 @@ export default function Page() {
           // onChange={(e) => setUserId(e.target.value)}
           {...register("userId", {
             required: "아이디는 필수 입력 항목입니다.",
+            validate: async (value) => {
+              try {
+                const res = await checkUserId({ userId: value });
+                return true;
+              } catch (error) {
+                const message = getErrorMessage(error);
+                return message || "중복 확인 중 오류 발생";
+              }
+            },
           })}
           className="border border-gray-300 p-2 rounded"
         />
