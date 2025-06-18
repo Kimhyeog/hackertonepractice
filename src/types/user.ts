@@ -1,5 +1,6 @@
 // 아이디 중복확인 타입
 export interface CheckUserIdResponse {
+  success: boolean;
   message: string;
 }
 
@@ -13,6 +14,7 @@ export interface SignUpRequest {
 }
 
 export interface SignUpResponse {
+  success: boolean;
   message: string;
 }
 
@@ -24,6 +26,7 @@ export interface LoginRequest {
 }
 
 export interface LoginResponse {
+  success: boolean;
   message: string;
 }
 

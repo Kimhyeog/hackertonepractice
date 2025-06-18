@@ -1,6 +1,6 @@
 // Next.js에서 Metadata 타입을 불러옵니다. HTML <head> 메타데이터 정의에 사용됩니다.
 import type { Metadata } from "next";
-
+import { Toaster } from "sonner";
 // Google Fonts인 Geist Sans 및 Mono 폰트를 불러옵니다.
 import { Geist, Geist_Mono } from "next/font/google";
 
@@ -37,6 +37,7 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`} // 설정한 폰트 CSS 변수 사용
       >
+        <Toaster richColors position="top-center" />
         <Provider>{children}</Provider>
       </body>
     </html>
