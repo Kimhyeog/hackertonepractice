@@ -1,5 +1,3 @@
-// 로그인
-
 import { API, getErrorMessage } from "@/lib/axios";
 import {
   CheckLoginStateResponse,
@@ -9,6 +7,7 @@ import {
   UserInfoResponse,
 } from "@/types/user";
 
+// 로그인
 export const login = async (data: LoginRequest): Promise<LoginResponse> => {
   try {
     const res = await API.post("/login", data);
@@ -31,14 +30,14 @@ export const checkLoginStatus = async (): Promise<CheckLoginStateResponse> => {
 };
 
 // 회원 정보 조회 API
-export const getUserInfo = async (): Promise<UserInfoResponse | null> => {
+export const getUserInfo = async (): Promise<UserInfoResponse> => {
   try {
     const res = await API.get("/userinfo");
     return res.data;
   } catch (error) {
     const message = getErrorMessage(error);
     console.error(message);
-    return null;
+    throw error; // ❗️ 중요: React Query가 isError로 인식하게 됨
   }
 };
 
