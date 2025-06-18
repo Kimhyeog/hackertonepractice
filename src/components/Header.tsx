@@ -3,11 +3,12 @@
 import { useUserStore } from "@/stores/useUserStore";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
+import { toast } from "sonner";
 
 export function Header() {
   const router = useRouter();
 
-  const { isLoggedIn, initUser } = useUserStore();
+  const { isLoggedIn, initUser, clearUser } = useUserStore();
   console.log(`로그인 상태 : ${isLoggedIn}`);
 
   // 로그인 상태 확인용 변수
@@ -20,8 +21,10 @@ export function Header() {
   };
   const handleLogout = () => {
     // 로그아웃 시, 상태 리셋
+    clearUser();
+
+    toast.success("로그아웃 성공");
     // 로그인 페이지 이동
-    router.push("/login");
   };
   const handleMyPage = () => {
     router.push("/mypage");

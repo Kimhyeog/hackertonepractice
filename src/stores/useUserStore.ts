@@ -1,4 +1,4 @@
-import { checkLoginStatus, getUserInfo } from "@/api/user";
+import { checkLoginStatus, getUserInfo, logout } from "@/api/user";
 import { UserInfoResponse } from "@/types/user";
 import { create } from "zustand";
 
@@ -12,7 +12,7 @@ type UserStore = {
 
   fetchUserInfo: () => Promise<void>;
 
-  clearUser: () => void;
+  clearUser: () => Promise<void>;
 
   initUser: () => Promise<void>;
 };
@@ -31,7 +31,10 @@ export const useUserStore = create<UserStore>((set) => ({
     set({ userInfo: res });
   },
 
-  clearUser: () => set({ isLoggedIn: false, userInfo: null }),
+  clearUser: async () => {
+    const res = await logout();
+    set({ isLoggedIn: false, userInfo: null });
+  },
 
   initUser: async () => {
     const { isLoggedIn } = await checkLoginStatus();
