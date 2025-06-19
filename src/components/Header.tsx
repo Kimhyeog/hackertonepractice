@@ -27,7 +27,7 @@ export function Header() {
     // 로그인 페이지 이동
   };
   const handleMyPage = () => {
-    router.push("/mypage");
+    router.push("/myPage");
   };
 
   useEffect(() => {
@@ -37,7 +37,7 @@ export function Header() {
   return (
     <header className="w-full p-4 flex justify-between items-center bg-gray-100 shadow">
       <div>로고</div>
-      <div>
+      <div className="flex items-center gap-x-3">
         <nav>
           {isLoggedIn && (
             <button

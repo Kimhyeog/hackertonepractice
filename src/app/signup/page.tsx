@@ -2,6 +2,7 @@
 // 회원 가입 페이지
 
 import { checkUserId, signUp } from "@/api/signup";
+import { useQueryWrapper } from "@/hooks/useQueryWrapper";
 import { getErrorMessage } from "@/lib/axios";
 import { CheckUserIdRequest } from "@/types/signup";
 import { SignUpRequest } from "@/types/user";
