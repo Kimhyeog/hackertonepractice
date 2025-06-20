@@ -18,7 +18,7 @@ export interface Post {
   comments: PostComment[]; // 댓글 목록
 }
 
-//게시물 전체 조회(최신 순) API 예시
+//게시물 전체 조회(최신 순) API
 
 export interface ReadPostsRequest {
   option: string;
@@ -27,4 +27,15 @@ export interface ReadPostsRequest {
 }
 
 // 응답은 Post 배열
-export type ReadPostsResponse = Post[];
+export interface ReadPostsResponse {
+  posts: Post[];
+}
+
+// 게시글 단일 조회 API
+export interface ReadSinglePostRequest {
+  postId: string;
+}
+
+export interface ReadSinglePostResponse {
+  post: Post;
+}

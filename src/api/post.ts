@@ -1,21 +1,10 @@
 import { getErrorMessage, PublicAPI } from "@/lib/axios";
-import { ReadPostsRequest, ReadPostsResponse } from "@/types/post";
-
-// export const getPosts = async (
-//   data: ReadPostsRequest
-// ): Promise<ReadPostsResponse> => {
-//   // if(data.options)에 따라 , 최신숟, 조회순, 탯글 순 출력
-//   try {
-//     const res = await PublicAPI.get(
-//       `/posts/read-${data.options}?size=${data.size}&page=${data.page}`
-//     );
-//     return res.data;
-//   } catch (error) {
-//     const message = getErrorMessage(error);
-//     throw error;
-//     return [];
-//   }
-// };
+import {
+  ReadPostsRequest,
+  ReadPostsResponse,
+  ReadSinglePostRequest,
+  ReadSinglePostResponse,
+} from "@/types/post";
 
 export const getPosts = async (
   data: ReadPostsRequest
@@ -26,8 +15,26 @@ export const getPosts = async (
     const res = await PublicAPI.get(
       `/posts/read-${option}?size=${size}&page=${page}`
     );
-    return res.data;
+
+    // export interface ReadPostsResponse {
+    //  타입이 이렇게 정의되어있다면, 저렇게 반환해야한다.
+    //   posts: Post[];
+    // }
+
+    return { posts: res.data };
   } catch (error) {
     throw error;
+  }
+};
+
+// api/post.ts
+export const getSinglePost = async (
+  data: ReadSinglePostRequest
+): Promise<ReadSinglePostResponse> => {
+  try {
+    const res = await PublicAPI.get(`/posts/read-one/${data.postId}`);
+    return { post: res.data }; // ✅ 반드시 { post: Post } 형태
+  } catch (error) {
+    throw error; // ✅ 반드시 throw 처리
   }
 };
