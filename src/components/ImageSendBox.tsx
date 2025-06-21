@@ -1,22 +1,15 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useImageCropper } from "@/hooks/useImageCropper";
+import ImageCropModal from "@/components/ImageCropModal";
 import { useMutation } from "@tanstack/react-query";
+import { sendDiagnosis } from "@/api/diagnosis";
+import { SkinDiagnosis } from "@/types/diagnosis";
+import { useState } from "react";
 import { toast } from "sonner";
 import Image from "next/image";
-import Cropper, { Area } from "react-easy-crop";
-import { getCroppedImg } from "@/utils/cropImage";
-import { SkinDiagnosis } from "@/types/diagnosis";
-import { sendDiagnosis } from "@/api/diagnosis";
-import GeneralModal from "@/components/GeneralModal";
 
-function ImageSendBox() {
-  const inputRef = useRef<HTMLInputElement>(null);
-  const [imageSrc, setImageSrc] = useState<string | null>(null);
-  const [cropping, setCropping] = useState(false);
-  const [crop, setCrop] = useState({ x: 0, y: 0 });
-  const [zoom, setZoom] = useState(1);
-  const [croppedAreaPixels, setCroppedAreaPixels] = useState<Area | null>(null);
+export default function ImageSendBox() {
   const [result, setResult] = useState<SkinDiagnosis | null>(null);
 
   const diagnoseMutation = useMutation({
@@ -34,75 +27,27 @@ function ImageSendBox() {
     },
   });
 
-  //업로드 된 직후 작동되는 핸들러
-  const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    //업로드 된 이미지 file 객체에 저장
-    const file = e.target.files?.[0];
-    if (!file) return;
-
-    if (file.size > 10 * 1024 * 1024) {
-      toast.error("이미지는 10MB 이하만 업로드 가능합니다.");
-      return;
-    }
-
-    //FileReader객체를 이용하여, 파일 → base64로 읽기
-    const reader = new FileReader();
-    reader.onload = () => {
-      // 나중에 크롭 UI에 넘겨줄 이미지
-      setImageSrc(reader.result as string);
-
-      // 크롭 모달 띄우기
-      setCropping(true);
-    };
-
-    //file을 base64 형식의 문자열로 변환하여 reader.result에 넣기ㅣ
-    reader.readAsDataURL(file);
-  };
-
-  // "진단하기" 버튼 핸들러
-  const handleCropAndUpload = async () => {
-    //이미지 소스가 없거나 크롭 영역 정보가 없으면 실행 중단
-    // - imageSrc는 base64 문자열,
-    // - croppedAreaPixels는 크롭된 사각형의 x, y, width, height 정보
-    if (!imageSrc || !croppedAreaPixels) return;
-
-    try {
-      // 크롭의 getCroppedImg()메소드를 거쳐, 서버 업로드가 가능한 JPEG 이미지  blob 객체로 반환
-      const blob = await getCroppedImg(imageSrc, croppedAreaPixels);
-
-      //Blob은 실제 파일은 아니므로, 서버에 보내기 위해 File로 감싼다.
-      /*
-        new File([blob], filename, { type }) 형식으로 사용합니다.
-
-        "cropped-image.jpg"라는 이름을 가진 JPEG 이미지로 만듭니다.
-      */
-
-      const file = new File([blob], "cropped-image.jpg", {
-        type: "image/jpeg",
-      });
-
-      // 서버에 최종 file 전송
-      diagnoseMutation.mutate({ image: file });
-
-      //크롭 모달 닫기
-      setCropping(false);
-
-      //초기 업로드한 이미지 제거
-      setImageSrc(null);
-    } catch (e) {
-      toast.error("이미지 처리 중 오류가 발생했습니다.");
-    }
-  };
+  //1. useImageCropper 훅에서 cropper 객체 생성
+  const cropper = useImageCropper((file) => {
+    //2. mutation 객체의 mutate인자에 file 전송
+    diagnoseMutation.mutate({ image: file });
+  });
 
   return (
     <div className="flex flex-col gap-4 items-start">
+      {/* 3. input 태그에 ref , onChange에 
+      cropper 객체의 
+        - inputRef 객체
+        - handleImageChange 메소드
+        등록
+      */}
       <input
         type="file"
-        accept="image/*"
-        ref={inputRef}
-        onChange={handleImageChange}
+        accept="image/png , image/jpg , image/jpeg"
+        ref={cropper.inputRef}
+        onChange={cropper.handleImageChange}
       />
-
+      {/* 출력부분 */}
       {result && (
         <div className="p-4 mt-4 border rounded w-full bg-white shadow">
           <h2 className="text-lg font-bold mb-2">진단 결과</h2>
@@ -130,42 +75,27 @@ function ImageSendBox() {
         </div>
       )}
 
-      <GeneralModal isOpen={cropping} onClose={() => setCropping(false)}>
-        <div className="flex flex-col items-center p-4 w-[300px] sm:w-[400px]">
-          <div className="relative w-full h-[300px] bg-black">
-            <Cropper
-              image={imageSrc!}
-              crop={crop}
-              zoom={zoom}
-              aspect={1}
-              onCropChange={setCrop}
-              onZoomChange={setZoom}
-              onCropComplete={(_, areaPixels) =>
-                setCroppedAreaPixels(areaPixels)
-              }
-            />
-          </div>
-          <div className="flex gap-2 mt-4">
-            <button
-              onClick={handleCropAndUpload}
-              className="bg-blue-500 text-white px-4 py-2 rounded"
-            >
-              진단하기
-            </button>
-            <button
-              onClick={() => {
-                setCropping(false);
-                setImageSrc(null);
-              }}
-              className="bg-gray-400 text-white px-4 py-2 rounded"
-            >
-              취소
-            </button>
-          </div>
-        </div>
-      </GeneralModal>
+      {/* 이미지 크롭 기능이 달린 모달창 */}
+      <ImageCropModal
+        // 모달이 열닫의 boolean 값
+        isOpen={cropper.cropping}
+        // 크롭할 이미지의 경로(Base64 문자열)
+        imageSrc={cropper.imageSrc!}
+        // 크롭의 x, y 축 좌표값이 들어간 객체 { x: number, y: number }
+        crop={cropper.crop}
+        // 이미지 확대/축소
+        zoom={cropper.zoom}
+        //사용자가 드래그로 크롭 위치를 바꿀 때 호출되는 콜백
+        onCropChange={cropper.setCrop}
+        //줌 슬라이더 변경 시 호출
+        onZoomChange={cropper.setZoom}
+        //사용자가 크롭 박스를 조절 완료했을 때 실행되는 콜백
+        onCropComplete={(_, area) => cropper.setCroppedAreaPixels(area)}
+        //"확인" 버튼을 눌렀을 때 실행할 함수 핸들러
+        onConfirm={cropper.handleCropConfirm}
+        //	"취소" 버튼을 눌렀을 때 실행할 함수
+        onCancel={cropper.cancelCrop}
+      />
     </div>
   );
 }
-
-export default ImageSendBox;
