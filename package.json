@@ -11,9 +11,12 @@
   "dependencies": {
     "@tanstack/react-query": "^5.80.7",
     "axios": "^1.9.0",
+    "framer-motion": "^12.18.1",
     "next": "15.3.3",
+    "pica": "^9.0.1",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
+    "react-easy-crop": "^5.4.2",
     "react-hook-form": "^7.58.1",
     "sonner": "^2.0.5",
     "zustand": "^5.0.5"
